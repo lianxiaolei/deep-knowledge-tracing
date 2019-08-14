@@ -91,7 +91,7 @@ class DKTTraining(object):
 
     config = Config()
 
-    dg = DataGenerator(fname, config)
+    dg = DataGenerator(fname, config.categories)
     dg.gen_attr()
 
     train_seqs = dg.train_seqs
@@ -109,11 +109,13 @@ class DKTTraining(object):
         with tf.variable_scope("dkt", reuse=None):
           train_dkt = DKT(categories=config.categories,
                           hidden_units=config.hidden_units)
+          train_dkt.build_net()
 
       with tf.name_scope("test"):
         with tf.variable_scope("dkt", reuse=True):
           test_dkt = DKT(categories=config.categories,
                          hidden_units=config.hidden_units)
+          test_dkt.build_net()
 
       self.train_dkt = train_dkt
       self.test_dkt = test_dkt

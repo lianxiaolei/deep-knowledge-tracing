@@ -8,7 +8,7 @@ from base_op import gen_metrics, mean
 def load_model(fname):
   config = Config()
 
-  dg = DataGenerator(fname, config)
+  dg = DataGenerator(fname, config.categories)
   dg.gen_attr(is_inference=True)  # 生成训练集和测试集
 
   infer_seqs = dg.inference_seqs

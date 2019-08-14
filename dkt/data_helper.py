@@ -130,6 +130,7 @@ class DataGenerator(object):
     mask = np.zeros(dim)
     if que_corr_location > 0:
       mask[que_corr_location] = 1.
+    return mask
 
   def format_data(self, sequences):
     seq_len = np.array(list(map(lambda seq: len(seq) - 1, sequences)))
@@ -144,12 +145,11 @@ class DataGenerator(object):
     #   the value of the queid+len(concepts) position of the (q,ans) vector is 1.
     # ====
     # We use the seq[0:-1] as input and seq[1:] as target.
-    x_sequences = np.array(
-      [[self.val_idx_dict[res[0] + self.num_concepts * res[1]] for res in seq[:-1]] for seq in sequences])
+    x_sequences = np.array([[(self.val_idx_dict[res[0]] + self.num_concepts * res[1]) for res in seq[:-1]] for seq in sequences])
 
     x_padding = self.pad_sequences(x_sequences, max_len=max_len, constant=-1)
 
-    x_input = np.array([[self.num_to_onehot(que, dim=self.num_concepts) for que in stu] for stu in x_padding])
+    x_input = np.array([[self.num_to_onehot(que, dim=self.num_concepts * 2) for que in stu] for stu in x_padding])
 
     # Generate question id sequence
     question_id_sequences = np.array(

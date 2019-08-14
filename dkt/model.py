@@ -10,7 +10,7 @@ class DKT(object):
 
     self.max_steps = tf.placeholder(tf.int32, name="max_steps")
 
-    self.input_data = tf.placeholder(tf.float32, [None, None, categories], name="input_x")
+    self.input_data = tf.placeholder(tf.float32, [None, None, categories * 2], name="input_x")
 
     self.sequence_len = tf.placeholder(tf.int32, [None], name="sequence_len")
 
