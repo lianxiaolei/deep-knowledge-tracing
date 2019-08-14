@@ -268,3 +268,5 @@ local.properties
 .idea
 data
 dkt/runs
+dkt/model
+dkt/seven*
