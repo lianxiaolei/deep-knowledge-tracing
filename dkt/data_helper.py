@@ -143,7 +143,7 @@ class DataGenerator(object):
     # res[0] + self.num_concepts * res[1] means if the student's answer for a question is true,
     #   the value of the queid+len(concepts) position of the (q,ans) vector is 1.
     # ====
-    # TODO We use the seq[0:-1] as input and seq[1:] as target.
+    # We use the seq[0:-1] as input and seq[1:] as target.
     x_sequences = np.array(
       [[self.val_idx_dict[res[0] + self.num_concepts * res[1]] for res in seq[:-1]] for seq in sequences])
 
@@ -188,7 +188,7 @@ class DataGenerator(object):
 
 
 if __name__ == '__main__':
-  dg = DataGenerator('../data/assistments.txt')
+  dg = DataGenerator('../data/assistments.txt', 100)
   assessment_seqs, concepts = dg.read_file()
   print('assessment', pformat(assessment_seqs))
   train, test = dg.split_dataset(assessment_seqs, test_size=0.1)

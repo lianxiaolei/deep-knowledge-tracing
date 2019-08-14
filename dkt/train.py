@@ -81,9 +81,12 @@ class DKTTraining(object):
 
   def run_epoch(self, fname):
     """
-    训练模型
-    :param filePath:
-    :return:
+
+    Args:
+      fname:
+
+    Returns:
+
     """
 
     config = Config()
