@@ -6,11 +6,9 @@ from base_op import gen_metrics, mean
 
 
 def load_model(fname):
-  # 实例化配置参数对象
   config = Config()
 
-  # 实例化数据生成对象
-  dg = DataGenerator(fileName, config)
+  dg = DataGenerator(fname, config)
   dg.gen_attr(is_inference=True)  # 生成训练集和测试集
 
   infer_seqs = dg.inference_seqs
@@ -20,7 +18,6 @@ def load_model(fname):
     saver = tf.train.import_meta_graph("{}.meta".format(checkpoint_file))
     saver.restore(sess, checkpoint_file)
 
-    # 获得默认的计算图结构
     graph = tf.get_default_graph()
 
     accuracys = []
@@ -61,12 +58,12 @@ def load_model(fname):
       aucs.append(auc)
       step += 1
 
-    aucMean = mean(aucs)
-    accMean = mean(accuracys)
+    auc_mean = mean(aucs)
+    acc_mean = mean(accuracys)
 
-    print("inference  auc: {}  acc: {}".format(aucMean, accMean))
+    print("inference  auc: {}  acc: {}".format(auc_mean, acc_mean))
 
 
 if __name__ == "__main__":
-  fileName = "../data/test.txt"
-  load_model(fileName)
+  fname = "../data/test.txt"
+  load_model(fname)
