@@ -41,7 +41,10 @@ def gen_metrics(sequence_len, binary_pred, pred, target_correctness):
   new_pred = np.concatenate(preds)
   new_target_correctness = np.concatenate(target_correctnesses)
 
-  auc = roc_auc_score(new_target_correctness, new_pred)
-  accuracy = accuracy_score(new_target_correctness, new_binary_pred)
+  try:
+    auc = roc_auc_score(new_target_correctness, new_pred)
+    accuracy = accuracy_score(new_target_correctness, new_binary_pred)
+  except Exception as e:
+    return None, None
 
   return auc, accuracy

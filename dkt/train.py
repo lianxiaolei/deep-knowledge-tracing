@@ -48,8 +48,8 @@ class DKTTraining(object):
 
     auc, accuracy = gen_metrics(params['seq_len'], binary_pred, pred, target_correctness)
 
-    time_str = datetime.datetime.now().isoformat()
-    print("train: {}: step {}, loss {}, acc {}, auc: {}".format(time_str, step, loss, accuracy, auc))
+    # time_str = datetime.datetime.now().isoformat()
+    print("train: step {}, loss {}, acc {}, auc: {}".format(step, loss, accuracy, auc))
     train_summary_writer.add_summary(summaries, step)
 
   def dev_step(self, params, dev_summary_op, writer=None):
@@ -178,9 +178,9 @@ class DKTTraining(object):
               accuracys.append(accuracy)
               aucs.append(auc)
 
-            time_str = datetime.datetime.now().isoformat()
-            print("dev: {}, step: {}, loss: {}, acc: {}, auc: {}".
-                  format(time_str, current_step, mean(losses), mean(accuracys), mean(aucs)))
+            # time_str = datetime.datetime.now().isoformat()
+            print("dev: step: {}, loss: {}, acc: {}, auc: {}".
+                  format(current_step, mean(losses), mean(accuracys), mean(aucs)))
 
           if current_step % config.checkpoint_every == 0:
             path = saver.save(sess, "model/my-model", global_step=current_step)
@@ -208,6 +208,7 @@ class DKTTraining(object):
 
 
 if __name__ == "__main__":
-  fname = "../data/assistments.txt"
+  # fname = "../data/assistments.txt"
+  fname = "../data/xb.csv"
   dktt = DKTTraining()
   dktt.run_epoch(fname)

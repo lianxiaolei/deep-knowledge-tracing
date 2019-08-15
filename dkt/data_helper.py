@@ -35,7 +35,7 @@ class DataGenerator(object):
     with open(self.fname, 'r', encoding='utf8') as fin:
       for line in fin:
         fields = line.strip().split(' ')  # a list like [sid, kid, result]
-        student, concept, is_correct = [int(item) for item in fields]
+        student, concept, is_correct = [int(item) if len(item) < 10 else item for item in fields]
 
         concepts.append(concept)
 
