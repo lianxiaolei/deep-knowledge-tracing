@@ -30,7 +30,7 @@ class DKT(object):
     """
     hidden_layers = []
     for idx, hidden_size in enumerate(self.hidden_units):
-      lstm_layer = tf.nn.rnn_cell.LSTMCell(num_units=hidden_size, state_is_tuple=True)
+      lstm_layer = tf.nn.rnn_cell.LSTMCell(num_units=hidden_size, state_is_tuple=True, name='lstm_cell')
       hidden_layer = tf.nn.rnn_cell.DropoutWrapper(cell=lstm_layer,
                                                    output_keep_prob=self.keep_prob)
       hidden_layers.append(hidden_layer)

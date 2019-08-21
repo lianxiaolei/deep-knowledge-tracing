@@ -116,6 +116,7 @@ class DKTTraining(object):
           test_dkt = DKT(categories=config.categories,
                          hidden_units=config.hidden_units)
           test_dkt.build_net()
+      print('Build network done.')
 
       self.train_dkt = train_dkt
       self.test_dkt = test_dkt
@@ -157,8 +158,10 @@ class DKTTraining(object):
       saver = tf.train.Saver(tf.global_variables())
 
       sess.run(tf.global_variables_initializer())
+      print('Compile model done.')
 
       batch_size = config.batch_size
+      print('Run config', batch_size, config.epochs)
       for i in range(config.epochs):
         np.random.shuffle(train_seqs)
         for params in dg.next_batch(train_seqs, batch_size, "train"):
@@ -185,8 +188,9 @@ class DKTTraining(object):
           if current_step % config.checkpoint_every == 0:
             path = saver.save(sess, "model/my-model", global_step=current_step)
             print("Saved model checkpoint to {}\n".format(path))
+      print('Train model done.')
+      # builder = tf.saved_model.builder.SavedModelBuilder("./tag543_model")
 
-      builder = tf.saved_model.builder.SavedModelBuilder("./sevenSkillModel")
       inputs = {"input_x": tf.saved_model.utils.build_tensor_info(self.train_dkt.input_data),
                 "target_id": tf.saved_model.utils.build_tensor_info(self.train_dkt.target_id),
                 "max_steps": tf.saved_model.utils.build_tensor_info(self.train_dkt.max_steps),
@@ -200,15 +204,15 @@ class DKTTraining(object):
                                                                                     outputs=outputs,
                                                                                     method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME)
       legacy_init_op = tf.group(tf.tables_initializer(), name="legacy_init_op")
-      builder.add_meta_graph_and_variables(sess, [tf.saved_model.tag_constants.SERVING],
-                                           signature_def_map={"predict": prediction_signature},
-                                           legacy_init_op=legacy_init_op)
-
-      builder.save()
+      # builder.add_meta_graph_and_variables(sess, [tf.saved_model.tag_constants.SERVING],
+      #                                      signature_def_map={"predict": prediction_signature},
+      #                                      legacy_init_op=legacy_init_op)
+      #
+      # builder.save()
 
 
 if __name__ == "__main__":
   # fname = "../data/assistments.txt"
-  fname = "../data/xb.csv"
+  fname = "../data/xbdata.csv"
   dktt = DKTTraining()
   dktt.run_epoch(fname)

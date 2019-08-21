@@ -57,6 +57,11 @@ class DataGenerator(object):
     for idx, v in enumerate(sorted(concepts)):
       self.idx_val_dict[idx] = v
       self.val_idx_dict[v] = idx
+    with open('idx_val_dict.txt', 'w') as fout:
+      fout.write(str(self.idx_val_dict))
+    with open('val_idx_dict.txt', 'w') as fout:
+      fout.write(str(self.val_idx_dict))
+    print('Save idx<=>val dict done.')
 
   def split_dataset(self, assessment_seqs, test_size=0.2, random_state=1.):
     """
