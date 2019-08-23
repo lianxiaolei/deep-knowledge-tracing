@@ -1,7 +1,7 @@
 import time
 import datetime
 import os
-
+os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 import numpy as np
 import tensorflow as tf
 
@@ -97,10 +97,14 @@ class DKTTraining(object):
     train_seqs = dg.train_seqs
     test_seqs = dg.test_seqs
 
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.8)
+
     session_conf = tf.ConfigProto(
+      gpu_options=gpu_options,
       allow_soft_placement=True,
       log_device_placement=False
     )
+
     sess = tf.Session(config=session_conf)
     self.sess = sess
 
@@ -161,7 +165,6 @@ class DKTTraining(object):
       print('Compile model done.')
 
       batch_size = config.batch_size
-      print('Run config', batch_size, config.epochs)
       for i in range(config.epochs):
         np.random.shuffle(train_seqs)
         for params in dg.next_batch(train_seqs, batch_size, "train"):
@@ -213,6 +216,7 @@ class DKTTraining(object):
 
 if __name__ == "__main__":
   # fname = "../data/assistments.txt"
-  fname = "../data/xbdata.csv"
+  # fname = "../data/xbdata.csv"
+  fname = "../data/khan_ass.csv"
   dktt = DKTTraining()
   dktt.run_epoch(fname)

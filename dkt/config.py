@@ -1,9 +1,9 @@
 # coding:utf8
 class Config(object):
   # batch_size = 128
-  batch_size = 16
+  batch_size = 32
   # categories = 267
-  categories = 543
+  categories = 123
 
   epochs = 128
   learning_rate = 0.01
