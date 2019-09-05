@@ -101,3 +101,4 @@ class DKT(object):
     output = self.head_rnn()
     self.tail_affine(output)
     self.compile()
+

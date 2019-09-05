@@ -15,7 +15,7 @@ class DKTTraining(object):
 
   def __init__(self):
     self.config = Config()
-    self.global_step = 0
+    self.global_step = None
 
   def add_gradient_noise(self, grad, stddev=1e-3, name=None):
     """
@@ -32,7 +32,7 @@ class DKTTraining(object):
     """
     dkt = self.train_dkt
     sess = self.sess
-    global_step = self.global_step
+    # global_step = self.global_step
 
     feed_dict = {dkt.input_data: params['input_x'],
                  dkt.target_id: params['target_id'],
@@ -43,7 +43,7 @@ class DKTTraining(object):
                  dkt.batch_size: self.config.batch_size}
 
     _, step, summaries, loss, binary_pred, pred, target_correctness = sess.run(
-      [train_op, global_step, train_summary_op, dkt.loss, dkt.binary_pred, dkt.pred, dkt.target_correctness],
+      [train_op, self.global_step, train_summary_op, dkt.loss, dkt.binary_pred, dkt.pred, dkt.target_correctness],
       feed_dict)
 
     auc, accuracy = gen_metrics(params['seq_len'], binary_pred, pred, target_correctness)
@@ -58,7 +58,7 @@ class DKTTraining(object):
     """
     dkt = self.test_dkt
     sess = self.sess
-    global_step = self.global_step
+    # global_step = self.global_step
 
     feed_dict = {dkt.input_data: params['input_x'],
                  dkt.target_id: params['target_id'],
@@ -68,7 +68,7 @@ class DKTTraining(object):
                  dkt.keep_prob: 1.0,
                  dkt.batch_size: len(params["seq_len"])}
     step, summaries, loss, pred, binary_pred, target_correctness = sess.run(
-      [global_step, dev_summary_op, dkt.loss, dkt.pred, dkt.binary_pred, dkt.target_correctness],
+      [self.global_step, dev_summary_op, dkt.loss, dkt.pred, dkt.binary_pred, dkt.target_correctness],
       feed_dict)
 
     auc, accuracy = gen_metrics(params['seq_len'], binary_pred, pred, target_correctness)
@@ -92,12 +92,12 @@ class DKTTraining(object):
     config = Config()
 
     dg = DataGenerator(fname, config.categories)
-    dg.gen_attr()
+    dg.gen_attr(need2gen=False)
 
     train_seqs = dg.train_seqs
     test_seqs = dg.test_seqs
 
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.8)
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
 
     session_conf = tf.ConfigProto(
       gpu_options=gpu_options,
@@ -125,8 +125,7 @@ class DKTTraining(object):
       self.train_dkt = train_dkt
       self.test_dkt = test_dkt
 
-      global_step = tf.Variable(0, name="global_step", trainable=False)
-      self.global_step = global_step
+      self.global_step = tf.Variable(0, name="global_step", trainable=False)
 
       optimizer = tf.train.AdamOptimizer(config.learning_rate)
       grads_and_vars = optimizer.compute_gradients(train_dkt.loss)
@@ -134,7 +133,7 @@ class DKTTraining(object):
       grads_and_vars = [(tf.clip_by_norm(g, config.max_grad_norm), v)
                         for g, v in grads_and_vars if g is not None]
 
-      train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step, name="train_op")
+      train_op = optimizer.apply_gradients(grads_and_vars, global_step=self.global_step, name="train_op")
 
       grad_summaries = []
       for g, v in grads_and_vars:
@@ -170,11 +169,10 @@ class DKTTraining(object):
         for params in dg.next_batch(train_seqs, batch_size, "train"):
           self.train_step(params, train_op, train_summary_op, train_summary_writer)
 
-          current_step = tf.train.global_step(sess, global_step)
+          current_step = tf.train.global_step(sess, self.global_step)
           if current_step % config.evaluate_every == 0:
             print("\nEvaluation:")
             # 获得测试数据
-
             losses = []
             accuracys = []
             aucs = []
@@ -188,7 +186,7 @@ class DKTTraining(object):
             print("dev: step: {}, loss: {}, acc: {}, auc: {}".
                   format(current_step, mean(losses), mean(accuracys), mean(aucs)))
 
-          if current_step % config.checkpoint_every == 0:
+          if current_step % config.checkpoint_every == 0 and loss < 0.1:
             path = saver.save(sess, "model/my-model", global_step=current_step)
             print("Saved model checkpoint to {}\n".format(path))
       print('Train model done.')
@@ -216,7 +214,8 @@ class DKTTraining(object):
 
 if __name__ == "__main__":
   # fname = "../data/assistments.txt"
-  # fname = "../data/xbdata.csv"
-  fname = "../data/khan_ass.csv"
+  # fname = "../data/xbdata0828.csv"
+  # fname = "../data/khan_ass.txt"
+  fname = "../data/khan_train.txt"
   dktt = DKTTraining()
   dktt.run_epoch(fname)

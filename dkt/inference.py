@@ -9,7 +9,7 @@ def inference(fname):
   config = Config()
 
   dg = DataGenerator(fname, config.categories)
-  dg.gen_attr(is_inference=True)  # 生成训练集和测试集
+  dg.gen_attr(is_inference=True, need2gen=False)  # 生成训练集和测试集
 
   infer_seqs = dg.inference_seqs
 
@@ -56,14 +56,14 @@ def inference(fname):
                                                         batch_size: len(params["seq_len"])})
 
       auc, acc = gen_metrics(params["seq_len"], binary_pred, pred, target_correctness)
-      print('pred_all', pred_all.shape, 'binary_pred', binary_pred.shape)
-      print('target_id', params["target_id"].shape)
+      # print('pred_all', pred_all.shape, 'binary_pred', binary_pred.shape)
+      # print('target_id', params["target_id"].shape)
 
-      import numpy as np
-      np.savetxt('pred.txt', pred, fmt='%.2f')
-      np.savetxt('pred_bin.txt', binary_pred, fmt='%d')
-      np.savetxt('target_id.txt', params["target_id"], fmt='%d')
-      np.savetxt('target_correctness.txt', params['target_correctness'], fmt='%d')
+      # import numpy as np
+      # np.savetxt('pred.txt', pred, fmt='%.2f')
+      # np.savetxt('pred_bin.txt', binary_pred, fmt='%d')
+      # np.savetxt('target_id.txt', params["target_id"], fmt='%d')
+      # np.savetxt('target_correctness.txt', params['target_correctness'], fmt='%d')
 
       accuracys.append(acc)
       aucs.append(auc)
@@ -76,5 +76,6 @@ def inference(fname):
 
 
 if __name__ == "__main__":
-  fname = "../data/xbdata.csv"
+  # fname = "../data/xbdata.csv"
+  fname = "../data/khan_test.txt"
   inference(fname)

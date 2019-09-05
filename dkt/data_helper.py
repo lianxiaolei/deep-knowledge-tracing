@@ -44,7 +44,7 @@ class DataGenerator(object):
 
     return assessment_seqs, list(set(concepts))
 
-  def gen_dict(self, concepts):
+  def gen_dict(self, concepts, need2gen):
     """
     Generate concept-index dict and index-concept dict.
     Args:
@@ -52,16 +52,22 @@ class DataGenerator(object):
         {stdent_id:[[kpid, result],[kpid, result]...], ...}
 
     """
-    self.idx_val_dict = {}
-    self.val_idx_dict = {}
-    for idx, v in enumerate(sorted(concepts)):
-      self.idx_val_dict[idx] = v
-      self.val_idx_dict[v] = idx
-    with open('idx_val_dict.txt', 'w') as fout:
-      fout.write(str(self.idx_val_dict))
-    with open('val_idx_dict.txt', 'w') as fout:
-      fout.write(str(self.val_idx_dict))
-    print('Save idx<=>val dict done.')
+    if need2gen:
+      self.idx_val_dict = {}
+      self.val_idx_dict = {}
+      for idx, v in enumerate(sorted(concepts)):
+        self.idx_val_dict[idx] = v
+        self.val_idx_dict[v] = idx
+      with open('../data/idx_val_dict.txt', 'w') as fout:
+        fout.write(str(self.idx_val_dict))
+      with open('../data/val_idx_dict.txt', 'w') as fout:
+        fout.write(str(self.val_idx_dict))
+      print('Save idx<=>val dict done.')
+    else:
+      with open('../data/idx_val_dict.txt', 'r') as fin:
+        self.idx_val_dict = eval(fin.readlines()[0].replace('\n', ''))
+      with open('../data/val_idx_dict.txt', 'r') as fin:
+        self.val_idx_dict = eval(fin.readlines()[0].replace('\n', ''))
 
   def split_dataset(self, assessment_seqs, test_size=0.2, random_state=1.):
     """
@@ -91,7 +97,7 @@ class DataGenerator(object):
 
     return assessment_seqs_train, assessment_seqs_test
 
-  def gen_attr(self, is_inference=False):
+  def gen_attr(self, is_inference=False, need2gen=True):
     """
 
     Args:
@@ -106,7 +112,7 @@ class DataGenerator(object):
     else:
       self.train_seqs, self.test_seqs = self.split_dataset(assessment_seqs,
                                                            test_size=0.16)
-    self.gen_dict(concepts)
+    self.gen_dict(concepts, need2gen)
 
   def pad_sequences(self, sequences, max_len=None, constant=0.):
     """
@@ -150,7 +156,8 @@ class DataGenerator(object):
     #   the value of the queid+len(concepts) position of the (q,ans) vector is 1.
     # ====
     # We use the seq[0:-1] as input and seq[1:] as target.
-    x_sequences = np.array([[(self.val_idx_dict[res[0]] + self.num_concepts * res[1]) for res in seq[:-1]] for seq in sequences])
+    x_sequences = np.array(
+      [[(self.val_idx_dict[res[0]] + self.num_concepts * res[1]) for res in seq[:-1]] for seq in sequences])
 
     x_padding = self.pad_sequences(x_sequences, max_len=max_len, constant=-1)
 
